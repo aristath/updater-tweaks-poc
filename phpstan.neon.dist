@@ -9,4 +9,6 @@ parameters:
         - plugin.php
         - rollbacks.php
         - db.php
+        - class-wp-upgrader-db.php
+        - class-wp-upgrader-db-plugin.php
         - dependencies.php
