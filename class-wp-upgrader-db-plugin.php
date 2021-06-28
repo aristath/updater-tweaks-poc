@@ -19,4 +19,15 @@ class WP_Upgrader_DB_Plugin extends WP_Upgrader_DB {
 	 * @var string
 	 */
 	protected $type = 'plugin';
+
+	/**
+	 * Constructor.
+	 *
+	 * @access public
+	 *
+	 * @param string $name The plugin name.
+	 */
+	public function __construct( $name ) {
+		$this->name = $name;
+	}
 }

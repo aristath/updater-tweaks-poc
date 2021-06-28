@@ -11,4 +11,6 @@ parameters:
         - db.php
         - class-wp-upgrader-db.php
         - class-wp-upgrader-db-plugin.php
+        - class-wp-upgrader-db-theme.php
         - dependencies.php
+        - example-plugin-db-upgrader.php

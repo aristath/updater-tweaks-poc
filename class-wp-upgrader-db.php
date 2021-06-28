@@ -30,6 +30,14 @@ abstract class WP_Upgrader_DB {
 	 */
 	protected $name;
 
+	/**
+	 * An array containing all registered migrations for this upgrader.
+	 *
+	 * @access protected
+	 *
+	 * @var array
+	 */
+	protected $migrations = array();
 
 	/**
 	 * The option-name where versions are stored in the database.
@@ -96,5 +104,99 @@ abstract class WP_Upgrader_DB {
 		$option_value[ $this->type ][ $this->name ] = $version;
 
 		return update_option( $this->option_name, $option_value );
+	}
+
+	/**
+	 * Register a migration step.
+	 *
+	 * @access public
+	 *
+	 * @param string          $from               The version from which we're starting.
+	 * @param string          $to                 The version to which we're ending.
+	 * @param string|callable $upgrade_callback   A callback to run on upgrade.
+	 * @param string|callable $downgrade_callback A callback to run on downgrade.
+	 *
+	 * @return void
+	 */
+	public function register_migration( $from, $to, $upgrade_callback = null, $downgrade_callback = null ) {
+		if ( ! isset( $this->migrations[ $from ] ) ) {
+			$this->migrations[ $from ] = array();
+		}
+		if ( ! isset( $this->migrations[ $from ][ $to ] ) ) {
+			$this->migrations[ $from ][ $to ] = array();
+		}
+		$this->migrations[ $from ][ $to ][] = array( $upgrade_callback, $downgrade_callback );
+	}
+
+	/**
+	 * Get an ordered array of migrations to run.
+	 *
+	 * @access protected
+	 *
+	 * @param string $from The version from which we're starting.
+	 * @param string $to   The version to which we're ending.
+	 *
+	 * @return array
+	 */
+	protected function get_registered_migrations( $from, $to ) {
+		$filtered_migrations = array();
+
+		uksort( $this->migrations, 'version_compare' );
+
+		foreach ( $this->migrations as $step_from => $migrations_steps ) {
+			if ( $from !== $step_from && version_compare( $from, $step_from ) >= 0 ) {
+				continue;
+			}
+
+			uksort( $migrations_steps, 'version_compare' );
+
+			foreach ( $migrations_steps as $step_to => $migrations ) {
+				if ( $to !== $step_to && version_compare( $to, $step_to ) <= 0 ) {
+					continue;
+				}
+
+				$filtered_migrations = array_merge( $filtered_migrations, $migrations );
+			}
+		}
+
+		return $filtered_migrations;
+	}
+
+	/**
+	 * Run migrations.
+	 *
+	 * If $from is greater than $to, then it's an upgrade.
+	 * If $to is greater than $from, then it's a dowgrade.
+	 *
+	 * @access public
+	 *
+	 * @param string $from The version from which we're starting.
+	 * @param string $to   The version to which we're ending.
+	 *
+	 * @return void
+	 */
+	public function upgrade( $from, $to ) {
+		$is_upgrade   = version_compare( $from, $to ) <= 0;
+		$is_downgrade = ! $is_upgrade;
+
+		// Get the steps.
+		if ( $is_downgrade ) {
+			$steps = $this->get_registered_migrations( $to, $from );
+		} else {
+			$steps = $this->get_registered_migrations( $from, $to );
+		}
+
+		// Reverse steps order if we're downgrading.
+		if ( $is_downgrade ) {
+			$steps = array_reverse( $steps );
+		}
+
+		// Run the callbacks.
+		foreach ( $steps as $step ) {
+			$callback = $is_downgrade ? $step[1] : $step[0];
+			if ( $callback && is_callable( $callback ) ) {
+				call_user_func( $callback );
+			}
+		}
 	}
 }
