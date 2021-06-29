@@ -248,14 +248,14 @@ abstract class WP_Upgrader_DB {
 	/**
 	 * Set the $current_version attribute.
 	 *
-	 * @access protected
+	 * @access public
 	 *
 	 * @param bool|WP_Error $result     Result from `WP_Upgrader::install_package()`.
 	 * @param array         $hook_extra Array of data for plugin/theme being updated.
 	 *
 	 * @return bool|WP_Error
 	 */
-	protected function set_new_version( $result, $hook_extra ) {
+	public function set_new_version( $result, $hook_extra ) {
 		if ( isset( $hook_extra[ $this->type ] ) && $this->name === $hook_extra[ $this->type ] ) {
 			$this->new_version = $this->get_current_version();
 		}
@@ -265,20 +265,20 @@ abstract class WP_Upgrader_DB {
 	/**
 	 * Runs migrations when needed.
 	 *
-	 * @access protected
+	 * @access public
 	 *
 	 * @param bool|WP_Error $result     Result from `WP_Upgrader::install_package()`.
 	 * @param array         $hook_extra Array of data for plugin/theme being updated.
 	 *
 	 * @return bool|WP_Error
 	 */
-	protected function maybe_run_migrations( $result, $hook_extra ) {
+	public function maybe_run_migrations( $result, $hook_extra ) {
 		if (
-			! is_wp_error( $result ) &&                   // The response is not an error.
-			isset( $hook_extra[ $this->type ] ) &&        // We're running the right type of upgrade.
+			! is_wp_error( $result ) && // The response is not an error.
+			isset( $hook_extra[ $this->type ] ) && // We're running the right type of upgrade.
 			$this->name === $hook_extra[ $this->type ] && // We're updating the right thing.
-			! empty( $this->new_version ) &&              // The new version exists.
-			! empty( $this->current_version ) &&          // The old version exists.
+			! empty( $this->new_version ) && // The new version exists.
+			! empty( $this->current_version ) && // The old version exists.
 			$this->new_version !== $this->current_version // The new version is not the same as the old version.
 		) {
 			$this->run_migrations( $this->current_version, $this->new_version );

@@ -66,7 +66,9 @@ add_filter(
 		 * WARNING:
 		THIS IS JUST FOR TESTING!!!
 		 */
-		$result = new WP_Error( 'test', 'test' );
+		if ( defined( 'TEST_ROLLBACKS' ) && TEST_ROLLBACKS ) {
+			$result = new WP_Error( 'test', 'test' );
+		}
 
 		if ( ! is_wp_error( $result ) ) {
 			return $result;

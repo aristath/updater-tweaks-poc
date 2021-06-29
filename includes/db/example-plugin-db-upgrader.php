@@ -14,38 +14,38 @@
 function my_plugin_upgrade_db() {
 	$upgrader = new WP_Upgrader_DB_Plugin( 'wordpress-reset/wordpress-reset.php' );
 	$upgrader->register_migration(
-		'1.2', // From.
-		'1.3', // To.
-		'my_theme_up_4', // Update callback.
-		'my_theme_down_4' // Downgrade callback.
+		'0.1', // From.
+		'1.5', // To.
+		function() { error_log( 'Update task 1' ); }, // phpcs:ignore
+		function() { error_log( 'Downgrade task 1' ); } // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
 		'0.1', // From.
 		'1.0', // To.
-		'my_theme_up_0', // Update callback.
-		'my_theme_down_0' // Downgrade callback.
+		function() { error_log( 'Update task 2' ); }, // phpcs:ignore
+		function() { error_log( 'Downgrade task 2' ); } // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
 		'1.0', // From.
 		'1.1', // To.
-		'my_theme_up_1', // Update callback.
-		'my_theme_down_1' // Downgrade callback.
+		function() { error_log( 'Update task 3' ); }, // phpcs:ignore
+		function() { error_log( 'Downgrade task 3' ); } // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
 		'1.0', // From.
 		'1.1', // To.
-		'my_theme_up_2', // Update callback.
-		'my_theme_down_2' // Downgrade callback.
+		function() { error_log( 'Update task 4' ); }, // phpcs:ignore
+		function() { error_log( 'Downgrade task 4' ); } // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
 		'1.0.1', // From.
 		'1.1', // To.
-		'my_theme_up_3', // Update callback.
-		'my_theme_down_3' // Downgrade callback.
+		function() { error_log( 'Update task 5' ); }, // phpcs:ignore
+		function() { error_log( 'Downgrade task 5' ); } // phpcs:ignore
 	);
 }
 my_plugin_upgrade_db();
