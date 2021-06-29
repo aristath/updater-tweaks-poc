@@ -69,6 +69,7 @@ abstract class WP_Upgrader_DB {
 		$this->current_version = $this->get_current_version();
 
 		add_action( 'upgrader_post_install', array( $this, 'maybe_run_migrations' ), 100, 3 );
+		add_action( 'wp', array( $this, 'maybe_trigger_manual_upgrades' ) );
 	}
 
 	/**
@@ -106,8 +107,16 @@ abstract class WP_Upgrader_DB {
 	 * @return string|false
 	 */
 	protected function get_version() {
-		$versions = $this->get_versions();
-		return isset( $versions[ $this->name ] ) ? $versions[ $this->name ] : false;
+		$option                = $this->get_option();
+		$option[ $this->type ] = isset( $option[ $this->type ] )
+			? (array) $option[ $this->type ]
+			: array();
+
+		if ( ! isset( $option[ $this->type ][ $this->name ] ) ) {
+			$option[ $this->type ][ $this->name ] = $this->get_current_version();
+			$this->set_version();
+		}
+		return $option[ $this->type ][ $this->name ];
 	}
 
 	/**
@@ -119,10 +128,13 @@ abstract class WP_Upgrader_DB {
 	 *
 	 * @return bool Returns the result of update_option.
 	 */
-	protected function set_version( $version ) {
+	protected function set_version( $version = null ) {
 		$option_value = $this->get_option();
 		if ( ! isset( $option_value[ $this->type ] ) ) {
 			$option_value[ $this->type ] = array();
+		}
+		if ( null === $version ) {
+			$version = $this->get_current_version();
 		}
 		$option_value[ $this->type ][ $this->name ] = $version;
 
@@ -220,6 +232,23 @@ abstract class WP_Upgrader_DB {
 			if ( $callback && is_callable( $callback ) ) {
 				call_user_func( $callback );
 			}
+		}
+	}
+
+	/**
+	 * Trigger migrations when we manually replace a plugin/theme in the filesystem.
+	 *
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function maybe_trigger_manual_upgrades() {
+		$db_version        = $this->get_version();
+		$installed_version = $this->get_current_version();
+
+		if ( (string) $db_version !== (string) $installed_version ) {
+			$this->run_migrations( $db_version, $installed_version );
+			$this->set_version( $installed_version );
 		}
 	}
 
