@@ -12,7 +12,7 @@
  * @return void
  */
 function my_plugin_upgrade_db() {
-	$upgrader = new WP_Upgrader_DB_Plugin( 'my-plugin' );
+	$upgrader = new WP_Upgrader_DB_Plugin( 'wordpress-reset/wordpress-reset.php' );
 	$upgrader->register_migration(
 		'1.2', // From.
 		'1.3', // To.
