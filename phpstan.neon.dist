@@ -7,10 +7,10 @@ parameters:
     inferPrivatePropertyTypeFromConstructor: true
     paths:
         - plugin.php
-        - rollbacks.php
-        - db.php
-        - class-wp-upgrader-db.php
-        - class-wp-upgrader-db-plugin.php
-        - class-wp-upgrader-db-theme.php
-        - dependencies.php
-        - example-plugin-db-upgrader.php
+        - includes/safe-unzip-rollback/rollbacks.php
+        - includes/db/db.php
+        - includes/db/class-wp-upgrader-db.php
+        - includes/db/class-wp-upgrader-db-plugin.php
+        - includes/db/class-wp-upgrader-db-theme.php
+        - includes/db/example-plugin-db-upgrader.php
+        - includes/dependencies/dependencies.php
