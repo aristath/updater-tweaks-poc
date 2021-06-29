@@ -65,7 +65,7 @@ class WP_Upgrader_DB_Plugin extends WP_Upgrader_DB {
 			$this->name === $hook_extra['plugin'] && // We're updating the right thing.
 			! empty( $new_version ) && // The new version exists.
 			! empty( $old_version ) && // The old version exists.
-			$new_version !== $old_version            // The new version is not the same as the old version.
+			$new_version !== $old_version // The new version is not the same as the old version.
 		) {
 			$this->run_migrations( $old_version, $new_version );
 		}
