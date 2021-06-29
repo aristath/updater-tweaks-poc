@@ -49,13 +49,37 @@ abstract class WP_Upgrader_DB {
 	private $option_name = 'db_versions';
 
 	/**
-	 * The current version (retrieved from the filesystem).
+	 * The current version.
 	 *
 	 * @access protected
 	 *
 	 * @var string
 	 */
 	protected $current_version;
+
+	/**
+	 * The new version.
+	 *
+	 * @access protected
+	 *
+	 * @var string
+	 */
+	protected $new_version;
+
+	/**
+	 * Constructor.
+	 *
+	 * @access public
+	 *
+	 * @param string $name The plugin name.
+	 */
+	public function __construct( $name ) {
+		$this->name            = $name;
+		$this->current_version = $this->get_current_version();
+
+		add_action( 'upgrader_install_package_result', array( $this, 'set_new_version' ), 1, 2 );
+		add_action( 'upgrader_install_package_result', array( $this, 'mmaybe_run_updates' ), 100, 2 );
+	}
 
 	/**
 	 * Gets the option value.
@@ -220,4 +244,21 @@ abstract class WP_Upgrader_DB {
 	 * @return string
 	 */
 	abstract protected function get_current_version();
+
+	/**
+	 * Set the $current_version attribute.
+	 *
+	 * @access protected
+	 *
+	 * @param bool|WP_Error $result     Result from `WP_Upgrader::install_package()`.
+	 * @param array         $hook_extra Array of data for plugin/theme being updated.
+	 *
+	 * @return bool|WP_Error
+	 */
+	protected function set_new_version( $result, $hook_extra ) {
+		if ( isset( $hook_extra[ $this->type ] ) && $this->name === $hook_extra[ $this->type ] ) {
+			$this->new_version = $this->get_current_version();
+		}
+		return $result;
+	}
 }

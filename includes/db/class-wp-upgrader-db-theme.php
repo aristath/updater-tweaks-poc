@@ -21,18 +21,6 @@ class WP_Upgrader_DB_Theme extends WP_Upgrader_DB {
 	protected $type = 'theme';
 
 	/**
-	 * Constructor.
-	 *
-	 * @access public
-	 *
-	 * @param string $name The plugin name.
-	 */
-	public function __construct( $name ) {
-		$this->name            = $name;
-		$this->current_version = $this->get_current_version();
-	}
-
-	/**
 	 * Get the current version.
 	 *
 	 * @abstract
