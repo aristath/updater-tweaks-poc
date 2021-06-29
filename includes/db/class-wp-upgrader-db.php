@@ -49,6 +49,15 @@ abstract class WP_Upgrader_DB {
 	private $option_name = 'db_versions';
 
 	/**
+	 * The current version (retrieved from the filesystem).
+	 *
+	 * @access protected
+	 *
+	 * @var string
+	 */
+	protected $current_version;
+
+	/**
 	 * Gets the option value.
 	 *
 	 * @access protected
@@ -199,4 +208,16 @@ abstract class WP_Upgrader_DB {
 			}
 		}
 	}
+
+	/**
+	 * Get the current version.
+	 * In most cases (plugins & themes) this will be done using the versions saved in files.
+	 *
+	 * @abstract
+	 *
+	 * @access protected
+	 *
+	 * @return string
+	 */
+	abstract protected function get_current_version();
 }
