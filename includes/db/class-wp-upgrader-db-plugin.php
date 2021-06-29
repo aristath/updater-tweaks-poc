@@ -69,6 +69,9 @@ class WP_Upgrader_DB_Plugin extends WP_Upgrader_DB {
 		) {
 			$this->run_migrations( $old_version, $new_version );
 		}
+
+		$this->set_version( $new_version );
+
 		return $response;
 	}
 }
