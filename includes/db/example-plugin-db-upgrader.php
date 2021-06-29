@@ -47,7 +47,5 @@ function my_plugin_upgrade_db() {
 		'my_theme_up_3', // Update callback.
 		'my_theme_down_3' // Downgrade callback.
 	);
-
-	$upgrader->upgrade( '1.0', '1.1' ); // WIP
 }
 my_plugin_upgrade_db();

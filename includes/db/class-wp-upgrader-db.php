@@ -175,7 +175,7 @@ abstract class WP_Upgrader_DB {
 	 *
 	 * @return void
 	 */
-	public function upgrade( $from, $to ) {
+	public function run_migrations( $from, $to ) {
 		$is_upgrade   = version_compare( $from, $to ) <= 0;
 		$is_downgrade = ! $is_upgrade;
 
