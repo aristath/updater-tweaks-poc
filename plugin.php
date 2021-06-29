@@ -16,6 +16,6 @@
 /**
  * Include files.
  */
-require_once __DIR__ . '/includes/rollback/rollbacks.php';
+require_once __DIR__ . '/includes/safe-unzip-rollback/rollbacks.php';
 require_once __DIR__ . '/includes/db/db.php';
 require_once __DIR__ . '/includes/dependencies/dependencies.php';
