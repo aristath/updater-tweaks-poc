@@ -110,7 +110,7 @@ abstract class WP_Upgrader_DB {
 
 		// Early exit if $version and $routine are not defined.
 		if ( ! $version || ! $routine_id ) {
-			return;
+			return false;
 		}
 		$option_value = $this->get_option();
 		if ( ! isset( $option_value[ $this->type ] ) ) {
