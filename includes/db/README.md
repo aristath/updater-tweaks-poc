@@ -57,6 +57,7 @@ class My_Plugin_Migrations {
 	protected function callback_110() { /* Do something. */ }
 	protected function callback_111() { /* Do something. */ }
 }
+new My_Plugin_Migrations();
 ```
 ## `WP_Upgrader_DB_Theme`
 
