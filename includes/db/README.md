@@ -16,7 +16,7 @@ Allows us to run migrations on a plugin.
 
 ```php
 $upgrader = new WP_Upgrader_DB_Plugin( $plugin_name );
-$upgrader->register_migration( $version, $routine_id, $callback );
+$upgrader->register_routine( $version, $routine_id, $callback );
 ```
 
 * `$plugin_name` (string): The plugin's slug.
@@ -31,8 +31,8 @@ function my_plugin_v110_upgrade() {
 }
 add_action( 'after_setup_plugin', function() {
 	$upgrader = new WP_Upgrader_DB_Plugin( 'my-plugin' );
-	$upgrader->register_migration( '1.1', 'my_plugin_v110_upgrade', 'my_plugin_v110_upgrade' );
-	$upgrader->register_migration( '1.2.0', 'my_plugin_v120_upgrade', function() {
+	$upgrader->register_routine( '1.1', 'my_plugin_v110_upgrade', 'my_plugin_v110_upgrade' );
+	$upgrader->register_routine( '1.2.0', 'my_plugin_v120_upgrade', function() {
 		// Do something.
 	} );
 });
@@ -50,7 +50,11 @@ class My_Plugin_Migrations {
 	public function __construct() {
 		$upgrader = new WP_Upgrader_DB_Plugin( $this->id );
 		foreach ( $this->routines as $version => $callback_method ) {
-			$upgrader->register_migration( $version, "{$this->id}_{$callback_method}", [ $this, $callback_method ] );
+			$upgrader->register_routine(
+				$version,
+				"{$this->id}_{$callback_method}",
+				[ $this, $callback_method ]
+			);
 		}
 	}
 	protected function callback_100() { /* Do something. */ }

@@ -134,7 +134,7 @@ abstract class WP_Upgrader_DB {
 	 *
 	 * @return void
 	 */
-	public function register_migration( $version, $routine_id, $callback = null ) {
+	public function register_routine( $version, $routine_id, $callback = null ) {
 		if ( ! isset( $this->routines[ $version ] ) ) {
 			$this->routines[ $version ] = array();
 		}
