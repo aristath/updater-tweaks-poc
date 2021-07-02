@@ -26,16 +26,12 @@ $upgrader->register_routine( $version, $routine_id, $callback );
 
 Example:
 ```php
-function my_plugin_v110_upgrade() {
-	// Do something.
-}
+function my_plugin_v110_upgrade() { /* Do something. */ }
 add_action( 'after_setup_plugin', function() {
 	$upgrader = new WP_Upgrader_DB_Plugin( 'my-plugin' );
 	$upgrader->register_routine( '1.1', 'my_plugin_v110_upgrade', 'my_plugin_v110_upgrade' );
-	$upgrader->register_routine( '1.2.0', 'my_plugin_v120_upgrade', function() {
-		// Do something.
-	} );
-});
+	$upgrader->register_routine( '1.2.0', 'my_plugin_v120_upgrade', function() { /* Do something. */ } );
+} );
 ```
 Or using a class:
 
