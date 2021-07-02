@@ -45,12 +45,12 @@ abstract class WP_Upgrader_DB {
 	 * Data in this option gets stored as an array:
 	$value = [
 		'plugin' => [
-			'my-plugin/plugin.php' => [
+			'my_plugin' => [
 				'1.0.0' => [ 'my_plugin_routine_1_id' ],
 				'1.1.0' => [ 'my_plugin_routine_2_id', 'my_plugin_routine_2_id' ],
 			],
 		],
-		'theme'  => [
+		'my_theme'  => [
 			'my-theme' => [
 				'1.2' => [ 'my_theme_routine_1' ],
 			]
@@ -81,7 +81,6 @@ abstract class WP_Upgrader_DB {
 	 */
 	public function __construct( $id ) {
 		$this->id = $id;
-
 		add_action( 'init', array( $this, 'run_routines' ) );
 	}
 
@@ -97,7 +96,7 @@ abstract class WP_Upgrader_DB {
 	}
 
 	/**
-	 * Set the version for a specific plugin/theme.
+	 * Mark successfully completed routines.
 	 *
 	 * @access protected
 	 *
@@ -128,7 +127,7 @@ abstract class WP_Upgrader_DB {
 	 *
 	 * @access public
 	 *
-	 * @param string          $version    The version to which we're ending.
+	 * @param string          $version    The version for this routine.
 	 * @param string          $routine_id A unique routine ID.
 	 * @param string|callable $callback   A callback to run on upgrade.
 	 *
@@ -147,7 +146,7 @@ abstract class WP_Upgrader_DB {
 	}
 
 	/**
-	 * Get routines that haven't run for this version.
+	 * Get routines that haven't completed.
 	 *
 	 * @access public
 	 *
@@ -156,16 +155,20 @@ abstract class WP_Upgrader_DB {
 	public function get_applicable_routines() {
 		$applicable_routines = $this->routines;
 
-		// Get an array of already applied routines.
-		$applied_routines = $this->get_applied_routines();
+		// Get an array of successfully applied routines.
+		$applied_routines = $this->get_successful_routines();
 
 		// Build the array of routines that have not yet been applied.
 		foreach ( $applicable_routines as $version => $routines ) {
 			if ( ! empty( $applied_routines[ $version ] ) ) {
+
+				// Remove successfully completed routines from the pool of routines to run.
 				foreach ( $applied_routines[ $version ] as $routine_id ) {
 					unset( $applicable_routines[ $version ][ $routine_id ] );
 				}
 			}
+
+			// Remove empty items from the array.
 			if ( empty( $applicable_routines[ $version ] ) ) {
 				unset( $applicable_routines[ $version ] );
 			}
@@ -181,7 +184,7 @@ abstract class WP_Upgrader_DB {
 	 *
 	 * @return array
 	 */
-	public function get_applied_routines() {
+	public function get_successful_routines() {
 		$option_value = $this->get_option();
 		if (
 			empty( $option_value[ $this->type ] ) ||
