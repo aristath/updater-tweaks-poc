@@ -146,21 +146,20 @@ abstract class WP_Upgrader_DB {
 	 *
 	 * @access public
 	 *
-	 * @param string          $from               The version from which we're starting.
-	 * @param string          $to                 The version to which we're ending.
-	 * @param string|callable $upgrade_callback   A callback to run on upgrade.
-	 * @param string|callable $downgrade_callback A callback to run on downgrade.
+	 * @param string          $from     The version from which we're starting.
+	 * @param string          $to       The version to which we're ending.
+	 * @param string|callable $callback A callback to run on upgrade.
 	 *
 	 * @return void
 	 */
-	public function register_migration( $from, $to, $upgrade_callback = null, $downgrade_callback = null ) {
+	public function register_migration( $from, $to, $callback = null ) {
 		if ( ! isset( $this->migrations[ $from ] ) ) {
 			$this->migrations[ $from ] = array();
 		}
 		if ( ! isset( $this->migrations[ $from ][ $to ] ) ) {
 			$this->migrations[ $from ][ $to ] = array();
 		}
-		$this->migrations[ $from ][ $to ][] = array( $upgrade_callback, $downgrade_callback );
+		$this->migrations[ $from ][ $to ][] = $callback;
 	}
 
 	/**
@@ -211,24 +210,13 @@ abstract class WP_Upgrader_DB {
 	 * @return void
 	 */
 	public function run_migrations( $from, $to ) {
-		$is_upgrade   = version_compare( $from, $to ) <= 0;
-		$is_downgrade = ! $is_upgrade;
+		$is_upgrade = version_compare( $from, $to ) <= 0;
 
 		// Get the steps.
-		if ( $is_downgrade ) {
-			$steps = $this->get_registered_migrations( $to, $from );
-		} else {
-			$steps = $this->get_registered_migrations( $from, $to );
-		}
-
-		// Reverse steps order if we're downgrading.
-		if ( $is_downgrade ) {
-			$steps = array_reverse( $steps );
-		}
+		$steps = $this->get_registered_migrations( $from, $to );
 
 		// Run the callbacks.
-		foreach ( $steps as $step ) {
-			$callback = $is_downgrade ? $step[1] : $step[0];
+		foreach ( $steps as $callback ) {
 			if ( $callback && is_callable( $callback ) ) {
 				call_user_func( $callback );
 			}

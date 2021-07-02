@@ -7,7 +7,7 @@
  *
  * This plugin aims to address the following:
  *      - Plugin & Theme Rollbacks, safe-unzip
- *      - DB upgrades & downgrades
+ *      - DB upgrades
  *      - Plugin Dependencies
  *
  * @package WordPress

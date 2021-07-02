@@ -17,35 +17,30 @@ function my_plugin_upgrade_db() {
 		'0.1', // From.
 		'1.5', // To.
 		function() { error_log( 'Update task 1' ); }, // phpcs:ignore
-		function() { error_log( 'Downgrade task 1' ); } // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
 		'0.1', // From.
 		'1.0', // To.
 		function() { error_log( 'Update task 2' ); }, // phpcs:ignore
-		function() { error_log( 'Downgrade task 2' ); } // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
 		'1.0', // From.
 		'1.1', // To.
 		function() { error_log( 'Update task 3' ); }, // phpcs:ignore
-		function() { error_log( 'Downgrade task 3' ); } // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
 		'1.0', // From.
 		'1.1', // To.
 		function() { error_log( 'Update task 4' ); }, // phpcs:ignore
-		function() { error_log( 'Downgrade task 4' ); } // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
 		'1.0.1', // From.
 		'1.1', // To.
 		function() { error_log( 'Update task 5' ); }, // phpcs:ignore
-		function() { error_log( 'Downgrade task 5' ); } // phpcs:ignore
 	);
 }
 my_plugin_upgrade_db();
