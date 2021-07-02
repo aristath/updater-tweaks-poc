@@ -22,13 +22,13 @@ abstract class WP_Upgrader_DB {
 	protected $type;
 
 	/**
-	 * The plugin/theme name.
+	 * The plugin/theme id.
 	 *
 	 * @access protected
 	 *
 	 * @var string
 	 */
-	protected $name;
+	protected $id;
 
 	/**
 	 * An array containing all registered routines for this upgrader.
@@ -77,10 +77,10 @@ abstract class WP_Upgrader_DB {
 	 *
 	 * @access public
 	 *
-	 * @param string $name    The plugin/theme name.
+	 * @param string $id The plugin/theme id.
 	 */
-	public function __construct( $name ) {
-		$this->name = $name;
+	public function __construct( $id ) {
+		$this->id = $id;
 
 		add_action( 'init', array( $this, 'run_routines' ) );
 	}
@@ -116,8 +116,8 @@ abstract class WP_Upgrader_DB {
 		if ( ! isset( $option_value[ $this->type ] ) ) {
 			$option_value[ $this->type ] = array();
 		}
-		$option_value[ $this->type ][ $this->name ][ $version ]   = array();
-		$option_value[ $this->type ][ $this->name ][ $version ][] = $routine_id;
+		$option_value[ $this->type ][ $this->id ][ $version ]   = array();
+		$option_value[ $this->type ][ $this->id ][ $version ][] = $routine_id;
 
 		// Update the option.
 		return update_option( $this->option_name, $option_value );
@@ -186,12 +186,12 @@ abstract class WP_Upgrader_DB {
 		$option_value = $this->get_option();
 		if (
 			empty( $option_value[ $this->type ] ) ||
-			empty( $option_value[ $this->type ][ $this->name ] )
+			empty( $option_value[ $this->type ][ $this->id ] )
 		) {
 			return array();
 		}
 
-		return $option_value[ $this->type ][ $this->name ];
+		return $option_value[ $this->type ][ $this->id ];
 	}
 
 	/**
@@ -221,7 +221,7 @@ abstract class WP_Upgrader_DB {
 							__( 'Upgrade routine %1$s for %2$s %3$s is invalid' ),
 							esc_html( $routine_id ), // The routine ID.
 							esc_html( $this->type ), // Can be plugin/theme.
-							esc_html( $this->name ) // The plugin/theme name.
+							esc_html( $this->id ) // The plugin/theme name.
 						)
 					);
 				}
