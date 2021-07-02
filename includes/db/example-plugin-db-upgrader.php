@@ -22,7 +22,7 @@ function my_plugin_upgrade_db() {
 	$upgrader->register_migration(
 		'1.0', // Version.
 		'update_task_2', // Routine ID.
-		function() { error_log( 'Update task 2' ); return new WP_Error( 'example_failed_upgrade', 'EXAMPLE FAIL' ); }, // phpcs:ignore
+		function() { return new WP_Error( 'example_failed_upgrade', 'EXAMPLE FAIL' ); }, // phpcs:ignore
 	);
 
 	$upgrader->register_migration(

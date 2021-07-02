@@ -154,21 +154,20 @@ abstract class WP_Upgrader_DB {
 	 * @return array
 	 */
 	public function get_applicable_routines() {
-		$applicable_routines = array();
+		$applicable_routines = $this->routines;
 
 		// Get an array of already applied routines.
 		$applied_routines = $this->get_applied_routines();
 
 		// Build the array of routines that have not yet been applied.
-		foreach ( $this->routines as $version => $routines ) {
-			if ( ! isset( $applied_routines[ $version ] ) ) {
-				$applicable_routines[ $version ] = $routines;
-				continue;
-			}
-			foreach ( $routines as $routine_id => $callback ) {
-				if ( ! isset( $applied_routines[ $version ][ $routine_id ] ) ) {
-					$applicable_routines[ $version ][ $routine_id ] = $callback;
+		foreach ( $applicable_routines as $version => $routines ) {
+			if ( ! empty( $applied_routines[ $version ] ) ) {
+				foreach ( $applied_routines[ $version ] as $routine_id ) {
+					unset( $applicable_routines[ $version ][ $routine_id ] );
 				}
+			}
+			if ( empty( $applicable_routines[ $version ] ) ) {
+				unset( $applicable_routines[ $version ] );
 			}
 		}
 
