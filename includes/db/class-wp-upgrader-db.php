@@ -42,11 +42,26 @@ abstract class WP_Upgrader_DB {
 	/**
 	 * The option-name where versions are stored in the database.
 	 *
+	 * Data in this option gets stored as an array:
+	$value = [
+		'plugin' => [
+			'my-plugin/plugin.php' => [
+				'1.0.0' => [ 'my_plugin_routine_1_id' ],
+				'1.1.0' => [ 'my_plugin_routine_2_id', 'my_plugin_routine_2_id' ],
+			],
+		],
+		'theme'  => [
+			'my-theme' => [
+				'1.2' => [ 'my_theme_routine_1' ],
+			]
+		]
+	];
+	 *
 	 * @access private
 	 *
 	 * @var string
 	 */
-	private $option_name = 'db_versions';
+	private $option_name = 'db_upgrade_routines';
 
 	/**
 	 * The current version.
@@ -92,6 +107,8 @@ abstract class WP_Upgrader_DB {
 	 * @return bool Returns the result of update_option.
 	 */
 	protected function set_successful_routine( $version = null, $routine_id = null ) {
+
+		// Early exit if $version and $routine are not defined.
 		if ( ! $version || ! $routine_id ) {
 			return;
 		}
@@ -102,6 +119,7 @@ abstract class WP_Upgrader_DB {
 		$option_value[ $this->type ][ $this->name ][ $version ]   = array();
 		$option_value[ $this->type ][ $this->name ][ $version ][] = $routine_id;
 
+		// Update the option.
 		return update_option( $this->option_name, $option_value );
 	}
 
@@ -120,7 +138,11 @@ abstract class WP_Upgrader_DB {
 		if ( ! isset( $this->routines[ $version ] ) ) {
 			$this->routines[ $version ] = array();
 		}
+
+		// Add the routine.
 		$this->routines[ $version ][ $routine_id ] = $callback;
+
+		// Make sure routines are sorted by version.
 		uksort( $this->routines, 'version_compare' );
 	}
 
@@ -132,9 +154,12 @@ abstract class WP_Upgrader_DB {
 	 * @return array
 	 */
 	public function get_applicable_routines() {
-		$applied_routines    = $this->get_applied_routines();
 		$applicable_routines = array();
 
+		// Get an array of already applied routines.
+		$applied_routines = $this->get_applied_routines();
+
+		// Build the array of routines that have not yet been applied.
 		foreach ( $this->routines as $version => $routines ) {
 			if ( ! isset( $applied_routines[ $version ] ) ) {
 				$applicable_routines[ $version ] = $routines;
@@ -146,6 +171,7 @@ abstract class WP_Upgrader_DB {
 				}
 			}
 		}
+
 		return $applicable_routines;
 	}
 
@@ -158,12 +184,13 @@ abstract class WP_Upgrader_DB {
 	 */
 	public function get_applied_routines() {
 		$option_value = $this->get_option();
-		if ( ! isset( $option_value[ $this->type ] ) ) {
-			$option_value[ $this->type ] = array();
+		if (
+			empty( $option_value[ $this->type ] ) ||
+			empty( $option_value[ $this->type ][ $this->name ] )
+		) {
+			return array();
 		}
-		if ( ! isset( $option_value[ $this->type ][ $this->name ] ) ) {
-			$option_value[ $this->type ][ $this->name ] = array();
-		}
+
 		return $option_value[ $this->type ][ $this->name ];
 	}
 
@@ -176,23 +203,38 @@ abstract class WP_Upgrader_DB {
 	 */
 	public function run_routines() {
 
-		// Get the routines.
+		// Get an array of applicable routines.
 		$applicable_routines = $this->get_applicable_routines();
 
+		// Loop all applicable routines, starting from oldest version to newest.
 		foreach ( $applicable_routines as $routines_version => $routines ) {
+
+			// Loop all routines for a specific version.
 			foreach ( $routines as $routine_id => $routine_callback ) {
-				if ( $routine_callback && ! is_callable( $routine_callback ) ) {
+
+				// Early exit with an error if the callback is invalid.
+				if ( ! is_callable( $routine_callback ) ) {
 					return new WP_Error(
 						'upgrade_routine_invalid',
-						__( 'Upgrade routine is invalid' ) // TODO: Add details for the plugin/theme name, the version & the routine ID.
+						sprintf(
+							/* translators: %1$s: ID of the failed routine. %2$s: Can be plugin/theme. %3$s: The plugin/theme name. */
+							__( 'Upgrade routine %1$s for %2$s %3$s is invalid' ),
+							esc_html( $routine_id ), // The routine ID.
+							esc_html( $this->type ), // Can be plugin/theme.
+							esc_html( $this->name ) // The plugin/theme name.
+						)
 					);
 				}
 
 				$routine = call_user_func( $routine_callback );
+
+				// Early eixt if there was an error with the callback routine.
+				// This prevents us from running a routine unless all previous ones have succeeded.
 				if ( is_wp_error( $routine ) ) {
 					return $routine;
 				}
 
+				// Set the routine as successful so it doesn't run again.
 				$this->set_successful_routine( $routines_version, $routine_id );
 			}
 		}
