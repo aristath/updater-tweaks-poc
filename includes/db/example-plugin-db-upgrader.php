@@ -14,32 +14,32 @@
 function my_plugin_upgrade_db() {
 	$upgrader = new WP_Upgrader_DB_Plugin( 'wordpress-reset/wordpress-reset.php' );
 	$upgrader->register_migration(
-		'0.1', // From.
-		'1.5', // To.
+		'1.5', // Version.
+		'update_task_1', // Routine ID.
 		function() { error_log( 'Update task 1' ); }, // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
-		'0.1', // From.
-		'1.0', // To.
-		function() { error_log( 'Update task 2' ); }, // phpcs:ignore
+		'1.0', // Version.
+		'update_task_2', // Routine ID.
+		function() { error_log( 'Update task 2' ); return new WP_Error( 'example_failed_upgrade', 'EXAMPLE FAIL' ); }, // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
-		'1.0', // From.
-		'1.1', // To.
+		'1.1', // Version.
+		'update_task_3', // Routine ID.
 		function() { error_log( 'Update task 3' ); }, // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
-		'1.0', // From.
-		'1.1', // To.
+		'1.1', // Version.
+		'update_task_4', // Routine ID.
 		function() { error_log( 'Update task 4' ); }, // phpcs:ignore
 	);
 
 	$upgrader->register_migration(
-		'1.0.1', // From.
-		'1.1', // To.
+		'0.3.2', // Version.
+		'update_task_5', // Routine ID.
 		function() { error_log( 'Update task 5' ); }, // phpcs:ignore
 	);
 }
