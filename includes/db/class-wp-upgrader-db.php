@@ -77,7 +77,8 @@ class WP_Upgrader_DB {
 	 *
 	 * @access public
 	 *
-	 * @param string $id The plugin/theme id.
+	 * @param string $type Can be plugin|theme.
+	 * @param string $id   The plugin/theme id.
 	 */
 	public function __construct( $type = 'plugin', $id ) {
 		$this->type = $type;
