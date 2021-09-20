@@ -8,7 +8,7 @@
 /**
  * The plugin & theme DB-Upgrader class.
  */
-abstract class WP_Upgrader_DB {
+class WP_Upgrader_DB {
 
 	/**
 	 * The option key.
