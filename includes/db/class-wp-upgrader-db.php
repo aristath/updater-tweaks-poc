@@ -79,8 +79,9 @@ abstract class WP_Upgrader_DB {
 	 *
 	 * @param string $id The plugin/theme id.
 	 */
-	public function __construct( $id ) {
-		$this->id = $id;
+	public function __construct( $type = 'plugin', $id ) {
+		$this->type = $type;
+		$this->id   = $id;
 		add_action( 'init', array( $this, 'run_routines' ) );
 	}
 

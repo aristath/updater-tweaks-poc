@@ -4,21 +4,12 @@ This POC implementation allows plugins & themes to register migration paths for 
 
 ## `WP_Upgrader_DB`
 
-This is an abstract class and should be extended for plugins/themes.
-Don't call this directly, instead call one of its children:
-* `WP_Upgrader_DB_Plugin`
-* `WP_Upgrader_DB_Theme`
-
-The reason we use children classes is to avoid conflicts in callback registrations in case there is a plugin and a theme with the same name.
-
-## `WP_Upgrader_DB_Plugin`
-Allows us to run migrations on a plugin.
-
 ```php
-$upgrader = new WP_Upgrader_DB_Plugin( $plugin_name );
+$upgrader = new WP_Upgrader_DB( $type, $plugin_name );
 $upgrader->register_routine( $version, $routine_id, $callback );
 ```
 
+* `$type` (string): `plugin`|`theme`
 * `$plugin_name` (string): The plugin's slug.
 * `$version` (string): The version for which this migration should apply.
 * `$routine_id` (string): A unique ID for the upgrade routine.
@@ -28,7 +19,7 @@ Example:
 ```php
 function my_plugin_v110_upgrade() { /* Do something. */ }
 add_action( 'after_setup_theme', function() {
-	$upgrader = new WP_Upgrader_DB_Plugin( 'my-plugin' );
+	$upgrader = new WP_Upgrader_DB( 'plugin', 'my-plugin' );
 	$upgrader->register_routine( '1.1', 'my_plugin_v110_upgrade', 'my_plugin_v110_upgrade' );
 	$upgrader->register_routine( '1.2.0', 'my_plugin_v120_upgrade', function() { /* Do something. */ } );
 } );
@@ -44,7 +35,7 @@ class My_Plugin_Migrations {
 		'1.1.1' => 'callback_111',
 	];
 	public function __construct() {
-		$upgrader = new WP_Upgrader_DB_Plugin( $this->id );
+		$upgrader = new WP_Upgrader_DB( $this->id );
 		foreach ( $this->routines as $version => $callback_method ) {
 			$upgrader->register_routine(
 				$version,
@@ -59,6 +50,3 @@ class My_Plugin_Migrations {
 }
 new My_Plugin_Migrations();
 ```
-## `WP_Upgrader_DB_Theme`
-
-Usage is exactly the same as `WP_Upgrader_DB_Plugin`.

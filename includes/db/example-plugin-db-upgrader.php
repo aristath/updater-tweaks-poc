@@ -12,7 +12,7 @@
  * @return void
  */
 function my_plugin_upgrade_db() {
-	$upgrader = new WP_Upgrader_DB_Plugin( 'wordpress-reset/wordpress-reset.php' );
+	$upgrader = new WP_Upgrader_DB( 'plugin', 'wordpress-reset/wordpress-reset.php' );
 	$upgrader->register_routine(
 		'1.5', // Version.
 		'update_task_1', // Routine ID.
