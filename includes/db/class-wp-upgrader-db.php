@@ -50,7 +50,7 @@ class WP_Upgrader_DB {
 				'1.1.0' => [ 'my_plugin_routine_2_id', 'my_plugin_routine_2_id' ],
 			],
 		],
-		'my_theme'  => [
+		'theme'  => [
 			'my-theme' => [
 				'1.2' => [ 'my_theme_routine_1' ],
 			]
